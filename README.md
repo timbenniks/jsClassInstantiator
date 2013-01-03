@@ -1,7 +1,7 @@
 ## JavaScript Class Instantiator
 This piece of code makes instantiating JavaScript classes a breeze.
 
-## The problem
+## Why
 We mostly create highly dynamic websites with loads of JavaScript and little page reloads.
 Contents get's added by ajax and DOM events are all over the place.
 
@@ -9,7 +9,7 @@ Keeping track of events and JavaScript that is bound to DOM nodes can be a pain 
 
 I created this script to avoid having to worry about the state of events and classes.
 
-## The solution
+## How
 The ClassInstantiator instantiates classes by scanning DOM nodes that have the `data-widget` tag.
 It binds the instance of the widget it found to the DOM node that has the `data-widget` attribute.
 Because the instance has been bound to the DOM node you just have to query the node to gain access to the public functions of the class.
