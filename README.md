@@ -78,7 +78,7 @@ Your classes can be an object literal or a prototype, as long as they live in a 
 
 		privateFunction = function()
 		{
-			// I'm a private funciton
+			// I'm a private function
 		},
 
 		publicFunction = function()
