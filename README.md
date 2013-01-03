@@ -52,7 +52,7 @@ If you add `data-options` attribute to a node which has a `data-widget` attribut
 ```
 Notice the single quotes around the object in the `data-options` attribute.
 
-### public functions
+### Public functions
 The ClassInstantiator provides four public functions. Check the source code to see which variables they need.
 * `Scan` Scan for elements that contain data-widget and instantiate the widget that is associated to the element.
 * `getWidgetBySelector` Get the widget instance for a DOM node
