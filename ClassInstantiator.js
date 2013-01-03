@@ -1,5 +1,5 @@
 /**
- * ClassInsantiator
+ * ClassInstantiator
  * @param  {object} $	jQuery
  * @param  {object} ns	NameSpace
  * @dependencies		jQuery
@@ -9,9 +9,9 @@
 	"use strict";
 
 	/**
-	 * ClassInsantiator Constructor
+	 * ClassInstantiator Constructor
 	 */
-	ns.ClassInsantiator = function()
+	ns.ClassInstantiator = function()
 	{
 		/**
 		 * Scan for elements that contain data-widget and instantiate the widget that is associated to the element.
