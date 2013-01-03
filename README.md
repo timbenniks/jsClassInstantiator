@@ -31,10 +31,10 @@ The instantiator is not meant for classes that do not interact with the DOM.
 ```javascript
 $(function($, ns)
 {
-	ns.ClassInsantiatorInstance = new ns.ClassInstantiator();
+	ns.ClassInstantiatorInstance = new ns.ClassInstantiator();
 
 	// After your content / html has been loaded:
-	ns.ClassInsantiatorInstance.scan($('.my-awesome-html'));
+	ns.ClassInstantiatorInstance.scan($('.my-awesome-html'));
 
 }(jQuery, window.NAMESPACE = window.NAMESPACE || {}));
 ```
