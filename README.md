@@ -53,11 +53,54 @@ If you add `data-options` attribute to a node which has a `data-widget` attribut
 Notice the single quotes around the object in the `data-options` attribute.
 
 ### public functions
-The ClassInstantiator provides four public functions. Check the source code to see which variables each function needs.
+The ClassInstantiator provides four public functions. Check the source code to see which variables they need.
 * `Scan` Scan for elements that contain data-widget and instantiate the widget that is associated to the element.
 * `getWidgetBySelector` Get the widget instance for a DOM node
 * `getWidgetsInContext` Get all widgets inside a DOM node
 * `destroyWidget` Destroy the widget instance by calling the destroy function and by removing the data form the DOM node
+
+### How your classes have to look
+Your classes can be an object literal or a prototype, as long as they live in a namespace and have a public `destroy` function.
+
+```javascript
+(function($, ns)
+{
+	"use strict";
+
+	ns.EXAMPLE_CLASS = function(element, options)
+	{
+		var el = $(element),
+
+		init = function()
+		{
+			// Do init stuff here or bind an event.
+		},
+
+		privateFunciton = function()
+		{
+			// I'm a private funciton
+		},
+
+		publicFunction = function()
+		{
+			// I'm a public function because I am returned at the bottom.
+		},
+
+		destroy = function()
+		{
+			// If events where bound, unbind them here.
+		};
+
+		init();
+
+		return {
+			destroy: destroy,
+			publicFunction: publicFunction
+		};
+	};
+
+}(jQuery, window.NAMESPACE = window.NAMESPACE || {}));
+```
 
 ## Dependencies
 jQuery
