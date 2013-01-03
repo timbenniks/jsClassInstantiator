@@ -88,7 +88,7 @@
 		},
 
 		/**
-		 * Get all widgets inside a context
+		 * Get all widgets inside a DOM node
 		 * @param  {HTMLElement} context    The html DOM node to search within
 		 * @param  {string} widgetName		The widget you are looking for
 		 * @return {array}					Returns an array of widget instances

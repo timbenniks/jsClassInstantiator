@@ -52,5 +52,12 @@ If you add `data-options` attribute to a node which has a `data-widget` attribut
 ```
 Notice the single quotes around the object in the `data-options` attribute.
 
+### public functions
+The ClassInstantiator provides four public functions. Check the source code to see which variables each function needs.
+* `Scan` Scan for elements that contain data-widget and instantiate the widget that is associated to the element.
+* `getWidgetBySelector` Get the widget instance for a DOM node
+* `getWidgetsInContext` Get all widgets inside a DOM node
+* `destroyWidget` Destroy the widget instance by calling the destroy function and by removing the data form the DOM node
+
 ## Dependencies
 jQuery
