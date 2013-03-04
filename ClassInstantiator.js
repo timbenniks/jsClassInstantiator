@@ -10,20 +10,30 @@
 
 	/**
 	 * ClassInstantiator Constructor
+	 * @param  {String} dataAttr The data-attribute to scan for. Defaults to 'widget'.
 	 */
-	ns.ClassInstantiator = function()
+	ns.ClassInstantiator = function(dataAttr)
 	{
+		var dataAttributeToScanFor = dataAttr || 'widget',
+
 		/**
 		 * Scan for elements that contain data-widget and instantiate the widget that is associated to the element.
+		 * Multiple widgets can be added to a DOM node. Seperate them by a ';'.
 		 * @param  {HTMLElement} context The context in which to search for DOM nodes
 		 */
-		var scan = function(context)
+		scan = function(context)
 		{
 			context = context || $(document.body);
 
-			context.find('[data-widget]').each(function(index, element)
+			context.find('[data-'+ dataAttributeToScanFor +']').each(function()
 			{
-				instantiate(element, $(element).data('widget'));
+				var element = $(this),
+					widgetToInstantiate = element.data('widget').split(';');
+
+				$.each(widgetToInstantiate, function(key, val)
+				{
+					instantiate(element, val);
+				});
 			});
 		},
 
@@ -36,20 +46,25 @@
 		instantiate = function(element, widgetName)
 		{
 			var InstanceName = cleanUpInstanceName(widgetName),
-				options, existingWidget, instance;
+				options,
+				existingWidget,
+				instance;
 
 			if(!widgetName || typeof InstanceName === 'string' || typeof InstanceName !== 'function')
 			{
 				return false;
 			}
 
-			options = $(element).data('options') || {};
-			existingWidget = $.data(element, widgetName);
-			instance = existingWidget || $.data(element, widgetName, new InstanceName(element, options));
+			/**
+			 * When multiple widgets are applied to a single DOM node, use data-<widgetName>-options attributes
+			 * to give the widgets their own options obejcts.
+			 */
+			options = element.data(widgetName.toLowerCase() +'Options') || element.data('options') || {};
+			existingWidget = $.data(element[0], widgetName);
 
-			if(typeof instance.destroy !== 'function')
+			if(existingWidget === undefined || existingWidget === null)
 			{
-				throw(instance.widget + ' does not have a destroy function');
+				instance = $.data(element[0], widgetName, new InstanceName(element, options));
 			}
 
 			return instance;
@@ -63,19 +78,23 @@
 		cleanUpInstanceName = function(widgetName)
 		{
 			var parts = widgetName.split('.'),
-			    widgetClass = ns;
-			
-			if (!parts.length) {
-			    throw('Cannot convert into a constructor');
+				widgetClass;
+
+			if(!parts.length)
+			{
+				throw('Cannot split ' + widgetName + '  into a parts');
 			}
-			    
-			while (parts.length) {
-			    widgetClass = widgetClass[parts.shift()];
-			    if (!widgetClass) {
-			    	throw('Cannot convert into a constructor');
-			    }
+
+			while(parts.length)
+			{
+				widgetClass = ns[parts.shift()];
+
+				if(!widgetClass)
+				{
+					throw('Cannot find [' + widgetName + '] as a function in your namespace.');
+				}
 			}
-			
+
 			return widgetClass;
 		},
 
@@ -91,19 +110,25 @@
 		},
 
 		/**
-		 * Get all widgets inside a DOM node
-		 * @param  {HTMLElement} context    The html DOM node to search within
-		 * @param  {string} widgetName		The widget you are looking for
-		 * @return {array}					Returns an array of widget instances
+		 * Get widgets in teh context of a DOM node.
+		 * @param  {HTMLElement} context	The context in which to search for DOM nodes
+		 * @param  {string} widgetName		Name of the widget you are looking for
+		 * @return {instance}				The instance of the widgetName
 		 */
 		getWidgetsInContext = function(context, widgetName)
 		{
 			var widgets = [];
 			context = context || $(document.body);
 
-			context.find('[data-widget="'+ widgetName +'"]').each(function()
+			context.find('[data-'+ dataAttributeToScanFor +']').each(function()
 			{
-				widgets.push(getWidgetBySelector($(this), widgetName));
+				var element = $(this),
+					widgetsOnNode = element.data('widget').split(';');
+
+				$.each(widgetsOnNode, function()
+				{
+					widgets.push(getWidgetBySelector(element, this));
+				});
 			});
 
 			return widgets;
@@ -130,12 +155,33 @@
 			}
 
 			$.removeData(selector[0], widget);
+		},
+
+		/**
+		 * Dispose of widgets in context
+		 * @param  {HTMLElement} context The context in which to search for DOM nodes
+		 */
+		destroyWidgetsInContext = function(context)
+		{
+			context = context || $(document.body);
+
+			context.find('[data-'+ dataAttributeToScanFor +']').each(function()
+			{
+				var disposeData = $(this).data('widget').split(';'),
+					element = $(this);
+
+				$.each(disposeData, function()
+				{
+					destroyWidget(element, this);
+				});
+			});
 		};
 
 		return {
 			scan: scan,
 			getWidgetBySelector: getWidgetBySelector,
 			getWidgetsInContext: getWidgetsInContext,
+			destroyWidgetsInContext: destroyWidgetsInContext,
 			destroyWidget: destroyWidget
 		};
 	};
