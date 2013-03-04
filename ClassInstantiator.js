@@ -117,10 +117,21 @@
 		 */
 		getWidgetsInContext = function(context, widgetName)
 		{
-			var widgets = [];
+			var widgets = [],
+			widgetsFound;
+
 			context = context || $(document.body);
 
-			context.find('[data-'+ dataAttributeToScanFor +']').each(function()
+			if(widgetName)
+			{
+				widgetsFound = context.find('[data-'+ dataAttributeToScanFor +'="'+ widgetName +'"]');
+			}
+			else
+			{
+				widgetsFound = context.find('[data-'+ dataAttributeToScanFor + ']');
+			}
+
+			widgetsFound.each(function()
 			{
 				var element = $(this),
 					widgetsOnNode = element.data('widget').split(';');
@@ -161,11 +172,22 @@
 		 * Dispose of widgets in context
 		 * @param  {HTMLElement} context The context in which to search for DOM nodes
 		 */
-		destroyWidgetsInContext = function(context)
+		destroyWidgetsInContext = function(context, widgetName)
 		{
+			var widgetsFound;
+
 			context = context || $(document.body);
 
-			context.find('[data-'+ dataAttributeToScanFor +']').each(function()
+			if(widgetName)
+			{
+				widgetsFound = context.find('[data-'+ dataAttributeToScanFor +'="'+ widgetName +'"]');
+			}
+			else
+			{
+				widgetsFound = context.find('[data-'+ dataAttributeToScanFor + ']');
+			}
+
+			widgetsFound.each(function()
 			{
 				var disposeData = $(this).data('widget').split(';'),
 					element = $(this);
