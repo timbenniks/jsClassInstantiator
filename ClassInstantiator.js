@@ -62,18 +62,21 @@
 		 */
 		cleanUpInstanceName = function(widgetName)
 		{
-			var parts = widgetName.split('.');
-
-			switch(parts.length)
-			{
-				case 1: return ns[ parts[0] ];
-				case 2: return ns[ parts[0] ] [ parts[1] ];
-				case 3: return ns[ parts[0] ] [ parts[1] ] [ parts[2] ];
-				case 4: return ns[ parts[0] ] [ parts[1] ] [ parts[2] ] [ parts[3] ];
-
-				default:
-					throw('Cannot convert into a constructor');
+			var parts = widgetName.split('.'),
+			    widgetClass = ns;
+			
+			if (!parts.length) {
+			    throw('Cannot convert into a constructor');
 			}
+			    
+			while (parts.length) {
+			    widgetClass = widgetClass[parts.shift()];
+			    if (!widgetClass) {
+			    	throw('Cannot convert into a constructor');
+			    }
+			}
+			
+			return widgetClass;
 		},
 
 		/**
