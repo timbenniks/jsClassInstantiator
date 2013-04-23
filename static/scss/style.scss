@@ -1,0 +1,182 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: #676e76;
+  max-width: 768px;
+  width: 100%;
+  margin: 50px auto;
+  color: #fefefe;
+  font-family: georgia, serif;
+  font-size: 15px;
+  line-height: 1.5;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, .4);
+  letter-spacing: .05em;
+}
+
+::selection {
+  background: #a0dcfb;
+}
+
+::-moz-selection {
+  background: #a0dcfb;
+}
+
+a {
+  color: #a0dcfb;
+  text-decoration: underline;
+
+  &:hover {
+    color: darken(#a0dcfb, 20);
+  }
+
+}
+
+h1, h2, h3 {
+  font-weight: normal;
+}
+
+h1 {
+  font-size: 30px;
+  line-height: 1;
+  margin: 0 0 15px 0;
+}
+
+h2 {
+  font-size: 20px;
+  line-height: 1;
+  font-style: italic;
+  margin: 35px 0 10px 0;
+  color: #a0dcfb;
+}
+
+ul, ol {
+  list-style-position: inside;
+}
+
+p, ul, ol {
+  margin: 0 0 20px 0;
+}
+
+article {
+  padding: 0 2em;
+  display: block;
+}
+
+pre {
+  background: darken(#676e76, 13);
+  padding: 5px 5px;
+  border: 1px solid darken(#676e76, 15);
+  overflow: auto;
+  display: block;
+  line-height: 16px;
+  word-wrap: break-word;
+
+  -webkit-overflow-scrolling: touch;
+  box-shadow: 0px 7px 15px -10px rgba(0, 0, 0, .7);
+
+  .comment {
+    color: lighten(#66747B, 20);
+    font-style: italic;
+  }
+
+  .constant {
+    color: #EC7600;
+  }
+
+  .storage {
+    color: #EC7600;
+  }
+
+  .string,
+  .comment.docstring {
+    color: #EC7600;
+  }
+
+  .string.regexp,
+  .support.tag.script,
+  .support.tag.style {
+    color: #fff;
+  }
+
+  .keyword,
+  .selector {
+    color: #93C763;
+  }
+
+  .inherited-class {
+    font-style: italic;
+  }
+
+  .entity {
+    color: #93C763;
+  }
+
+  .integer {
+    color: #FFCD22;
+  }
+
+  .support {
+    color: #FACD22;
+  }
+
+  .variable.global,
+  .variable.class,
+  .variable.instance {
+    color: #CCC;
+  }
+
+  code {
+    background: none;
+    color: #eee;
+    padding: 0;
+  }
+}
+
+code {
+  font-family: consolas, monaco, courier, monospace;
+  background: darken(#676e76, 5);
+  text-shadow: none;
+  padding: 1px 3px 2px 3px;
+  color: #eee;
+  font-size: 13px;
+}
+
+figure {
+  display: block;
+  margin: 0 0 15px 0;
+
+  figcaption {
+    display: block;
+    font-size: 11px;
+    margin: 5px 0 0 0;
+    font-style: italic;
+  }
+}
+
+nav {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 100px;
+  width: 100px;
+  height: auto;
+  background: darken(#676e76, 5);
+  border: 1px solid darken(#676e76, 8);
+  padding: 15px;
+  box-shadow: 0px 7px 15px -10px rgba(0, 0, 0, .7);
+
+  a {
+    display: block;
+    line-height: 2;
+  }
+}
+
+@media screen and (min-width: 1100px)
+{
+  nav {
+    display: block;
+  }
+}

@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>JavaScript Class Instantiator</title>
+	<link href="./static/css/style.css" rel="stylesheet" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=1,minimum-scale=1,maximum-scale=1" />
+</head>
+<body>
+	<div id="wrapper">
+		<p>I am a <em data-widget="Tooltip;OtherWidget" data-Tooltip-options='{"title":"I am a tooltip!"}' data-OtherWidget-options='{"option":"option"}'>nice</em> sentence</p>
+	</div>
+</article>
+
+<script>
+	document.write('<script src=./libs/' + ('__proto__' in {} ? 'zepto' : 'jquery') + '.js><\/script>');
+</script>
+
+<script src="./libs/rainbow.min.js"></script>
+<script src="./src/ClassInstantiator.js"></script>
+<script>
+
+	(function ($, ns)
+	{
+		'use strict';
+
+		ns.Tooltip = function (el, options)
+		{
+			var element = $(el),
+				title = options.title,
+
+			init = function ()
+			{
+				element.on('mouseenter.tooltip', handleTooltip);
+			},
+
+			handleTooltip = function ()
+			{
+				console.log('[Tooltip]: ', title);
+			},
+
+			destroy = function()
+			{
+				element.off('mouseenter.tooltip');
+			}
+
+			init();
+
+			return {
+				node: element[0],
+				widget: 'Tooltip',
+				options: options,
+				destroy: destroy
+			}
+
+		};
+
+	}($, window.NAMESPACE = window.NAMESPACE || {}));
+
+	(function ($, ns)
+	{
+		'use strict';
+
+		ns.OtherWidget = function (el, options)
+		{
+			var element = $(el),
+				option = options.option,
+
+			init = function ()
+			{
+				console.log('[OtherWidget]: ', option);
+			},
+
+			destroy = function()
+			{
+				return true;
+			}
+
+			init();
+
+			return {
+				node: element[0],
+				widget: 'OtherWidget',
+				options: options,
+				destroy: destroy
+			}
+
+		};
+
+	}($, window.NAMESPACE = window.NAMESPACE || {}));
+
+	$(function ($, ns)
+	{
+		ns.ClassInstantiatorInstance = new ns.ClassInstantiator();
+		ns.ClassInstantiatorInstance.scan($('article')[0]);
+
+		console.log('[Tooltip Instance]: ', ns.ClassInstantiatorInstance.getWidgetBySelector($('em')[0], 'Tooltip'));
+		console.log('[OtherWidget Instance]: ', ns.ClassInstantiatorInstance.getWidgetBySelector($('em')[0], 'OtherWidget'));
+		console.log('[widgetsInContext of article]: ', ns.ClassInstantiatorInstance.getWidgetsInContext($('article')[0]));
+
+		ns.ClassInstantiatorInstance.destroyWidget($('em')[0], 'OtherWidget');
+		console.log('[destroyed OtherWidget right?]: ', ns.ClassInstantiatorInstance.getWidgetBySelector($('em')[0], 'OtherWidget'));
+
+		ns.ClassInstantiatorInstance.scan($('article')[0]);
+		console.log('[widgetsInContext of article after destroyed widget and new scan]: ', ns.ClassInstantiatorInstance.getWidgetsInContext($('article')[0]));
+
+	}($, window.NAMESPACE = window.NAMESPACE || {}));
+
+</script>
+</body>
+</html>
