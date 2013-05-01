@@ -8,10 +8,32 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=1,minimum-scale=1,maximum-scale=1" />
 </head>
 <body>
-	<div id="wrapper">
-		<p>I am a <em data-widget="Tooltip;OtherWidget" data-Tooltip-options='{"title":"I am a tooltip!"}' data-OtherWidget-options='{"option":"option"}'>nice</em> sentence</p>
-	</div>
-</article>
+
+	<nav>
+		<a href="#why-you-want-this">Why you want this</a>
+		<a href="#how-it-does-what-it-does">How it does what it does</a>
+		<a href="#implementation">Implementation</a>
+	</nav>
+
+	<article>
+
+		<h1 id="why-you-want-this">Why you want this</h1>
+		<p>
+			At AQKA we mostly create highly dynamic and rich websites.
+			Pages have loads of JavaScript and content is often loaded asynchronously.
+		</p>
+		<p>
+			Most of the time DOM events are all over the place and keeping track of them could be a pain when there is a lot of html that constantly changes due to AJAX calls.
+		</p>
+		<p>
+			I created this script to avoid having to worry about the state of events and class instances.
+			It makes working with JavaScript classes aven DOM events a breeze.
+		</p>
+
+		<div id="wrapper">
+			<p>I am a <em data-widget="Tooltip;OtherWidget" data-Tooltip-options='{"title":"I am a tooltip!"}' data-OtherWidget-options='{"option":"option"}'>nice</em> sentence</p>
+		</div>
+	</article>
 
 <script>
 	document.write('<script src=./libs/' + ('__proto__' in {} ? 'zepto' : 'jquery') + '.js><\/script>');

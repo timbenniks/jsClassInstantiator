@@ -8,7 +8,7 @@ Content get's added by ajax and DOM events are all over the place.
 Keeping track of events and JavaScript that is bound to DOM nodes can be a pain
 when the html is big and new content is constantly loaded with ajax.
 
-I created this script to avoid having to worry about the state of events and classes.
+I created this script to avoid having to worry about the state of events and class instances.
 
 ## How
 The ClassInstantiator instantiates classes by scanning DOM nodes that have the `data-widget` tag.
