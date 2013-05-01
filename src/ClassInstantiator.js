@@ -19,15 +19,37 @@
 
 		/**
 		 * Scan for elements that contain data-widget and instantiate the widget that is associated to the element.
-		 * Multiple widgets can be added to a DOM node. Seperate them by a ';'.
 		 * @param {HTMLElement} context The context in which to search for DOM nodes.
 		 */
 		scan = function (context)
 		{
 			context = context || document.body;
 
+			var widgets = findWidgets(context),
+			i = 0;
+
+			if(widgets)
+			{
+				for(; i < widgets.length; i++)
+				{
+					instantiate(widgets[i].widget, widgets[i].widgetToInstantiate);
+				}
+			}
+		},
+
+		/**
+		 * Find elements that contain data-widget and add teh element and the widget to the widgets array.
+		 * Multiple widgets can be added to a DOM node. Seperate them by a ';'.
+		 * @param {HTMLElement} context The context in which to search for DOM nodes.
+		 * @return {array} returns an array with the widget DOM node and the widget name.
+		 */
+		findWidgets = function (context)
+		{
+			context = context || document.body;
+
 			var widgetsFound = getNode(context, '[data-' + dataAttributeToScanFor + ']'),
-				i = 0, c = 0;
+				i = 0, c = 0,
+				widgets = [];
 
 			for (; i < widgetsFound.length; i++)
 			{
@@ -36,9 +58,11 @@
 
 				for (; c < widgetToInstantiate.length; c++)
 				{
-					instantiate(widget, widgetToInstantiate[c]);
+					widgets.push({'widget': widget, 'widgetToInstantiate': widgetToInstantiate[c]});
 				}
 			}
+
+			return widgets;
 		},
 
 		/**
@@ -138,14 +162,7 @@
 
 			context = context || document.body;
 
-			if (widgetName)
-			{
-				widgetsFound = getNode(context, '[data-' + dataAttributeToScanFor + '="' + widgetName + '"]');
-			}
-			else
-			{
-				widgetsFound = getNode(context, '[data-' + dataAttributeToScanFor + ']');
-			}
+			widgetsFound = getNode(context, '[data-' + dataAttributeToScanFor + ']');
 
 			for (; i < widgetsFound.length; i++)
 			{
@@ -154,7 +171,15 @@
 
 				for (; c < widgetToReturn.length; c++)
 				{
-					widgets.push(getWidgetBySelector(widget, widgetToReturn[c]));
+					if(widgetName && widgetName === widgetToReturn[c])
+					{
+						widgets.push(getWidgetBySelector(widget, widgetToReturn[c]));
+						break;
+					}
+					else
+					{
+						widgets.push(getWidgetBySelector(widget, widgetToReturn[c]));
+					}
 				}
 			}
 
@@ -167,7 +192,7 @@
 		 * @param {HTMLElement} selector The DOM node of the widget.
 		 * @param {string} widgetName The widget you want to destroy.
 		 */
-		destroyWidget = function (selector, widgetName)
+		destroyWidgetBySelector = function (selector, widgetName)
 		{
 			var widgetInstance = getWidgetBySelector(selector, widgetName);
 
@@ -211,7 +236,7 @@
 
 				for (; c < widgetToDestroy.length; c++)
 				{
-					destroyWidget(widget, widgetToDestroy[c]);
+					destroyWidgetBySelector(widget, widgetToDestroy[c]);
 				}
 			}
 
@@ -266,10 +291,12 @@
 
 		return {
 			scan: scan,
+			findWidgets: findWidgets,
+			instantiate: instantiate,
 			getWidgetBySelector: getWidgetBySelector,
 			getWidgetsInContext: getWidgetsInContext,
 			destroyWidgetsInContext: destroyWidgetsInContext,
-			destroyWidget: destroyWidget,
+			destroyWidgetBySelector: destroyWidgetBySelector,
 			cleanUpInstanceName: cleanUpInstanceName,
 			getDataAttr: getDataAttr,
 			getNode: getNode

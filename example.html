@@ -99,7 +99,7 @@
 		console.log('[OtherWidget Instance]: ', ns.ClassInstantiatorInstance.getWidgetBySelector($('em')[0], 'OtherWidget'));
 		console.log('[widgetsInContext of article]: ', ns.ClassInstantiatorInstance.getWidgetsInContext($('article')[0]));
 
-		ns.ClassInstantiatorInstance.destroyWidget($('em')[0], 'OtherWidget');
+		ns.ClassInstantiatorInstance.destroyWidgetBySelector($('em')[0], 'OtherWidget');
 		console.log('[destroyed OtherWidget right?]: ', ns.ClassInstantiatorInstance.getWidgetBySelector($('em')[0], 'OtherWidget'));
 
 		ns.ClassInstantiatorInstance.scan($('article')[0]);
