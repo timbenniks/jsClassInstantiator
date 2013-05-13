@@ -12,7 +12,7 @@ The class instantiator has a scan function that scans a specific piece of html.
 If it finds DOM nodes with the `data-widget` attribute on it, it locates the JavaScript function which is named like the `data-widget` value and tries to instantiate it.
 
 If the function exists and it can be instantiated, the class instantiator saves the instance in a dictionary.
-`widgetDictionary[&lt;HTMLElement&gt;][&lt;widgetInstance&gt;];`
+`widgetDictionary[<HTMLElement>][<widgetInstance>];`
 
 When the instance has public functions you can access these by asking the widget dictionary to return the instance you want by supplying the DOM node and the widget name.
 
