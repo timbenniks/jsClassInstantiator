@@ -13,6 +13,9 @@
 		<a href="#why-you-want-this">Why you want this</a>
 		<a href="#how-it-works">How it works</a>
 		<a href="#implementation">Implementation</a>
+		<a href="#public-functions">Public functions</a>
+		<a href="#dependencies">Dependencies</a>
+		<a href="#the-widget">The widget itself</a>
 	</nav>
 
 	<article>
@@ -24,26 +27,28 @@
 			I created this script to avoid having to worry about the state of events and function instances when creating new HTML.
 		</p>
 
-		<h1>How it works</h1>
+		<h1 id="how-it-works">How it works</h1>
 		<p>
 			The point of this script is to keep your code as stateless as possible.
 			The class instantiator has a scan function that scans a specific piece of html.
-			If it finds DOM nodes with the <code data-language="html">data-widget</code> attribute on it, it locates the JavaScript function which is named like the <code data-language="html">data-widget</code> value and tries to instantiate it.
+			If it finds DOM nodes with the <code>data-widget</code> attribute on it, it locates the JavaScript function which is named like the <code>data-widget</code> value and tries to instantiate it.
 		</p>
 		<p>
 			If the function exists and it can be instantiated, the class instantiator saves the instance in a dictionary.
 			<code data-language="javascript">widgetDictionary[&lt;HTMLElement&gt;][&lt;widgetInstance&gt;];</code>
 		</p>
+		<p>
+			When the instance has public functions you can access these by asking the widget dictionary to return the instance you want by supplying the DOM node and the widget name.
+		</p>
 
-		<h3>Added benefit</h3>
+		<h2>Added benefit</h2>
 		<p>
-			The <code data-language="html">data-widget</code> tag gives extra semantics to the html and also enables less
+			The <code>data-widget</code> tag gives extra semantics to the html and also enables less
 			technical people to add JavaScript to a new piece of html in an easy way.
-			Just add <code data-language="html">data-widget="tooltip"</code> and you are done.
+			Just add <code>data-widget="tooltip"</code> and you are done.
 		</p>
-		<p>
-			<em>The class instantiator is only meant to be used for functions that interact with DOM nodes. It is not meant for functions which are only called once.</em>
-		</p>
+
+		<h1 id="implementation">Implementation</h1>
 
 <pre><code data-language="html"><div id="my-awesome-html">
     <p>Nice <span data-widget="Tooltip" title="I am a Tooltip">text</span> about something.</p>
@@ -62,18 +67,96 @@
     <p>Nice <span data-widget="Tooltip;AnotherWidget" title="I am a Tooltip">text</span> about something.</p>
 </div></code></pre>
 
-		<h2>Public functions</h2>
 		<p>
-			When the instance has public functions you can access these by asking the widget dictionary to return the instance you want by supplying the DOM node and the widget name.
+			<em>The class instantiator is only meant to be used for functions that interact with DOM nodes. It is not meant for functions that are only called once.</em>
 		</p>
 
-		<h2>Options</h2>
+		<h2>After an ajax call</h2>
 		<p>
-			When the instance has public functions you can access these by asking the widget dictionary to return the instance you want by supplying the DOM node and the widget name.
+			When new content has been loaded into an html element, new nodes with the <code>data-widget</code> attribute could have been added.
+			If the html element used to contain widgets, there is a chance DOM events are still bound.
+			Even when the html is gone, the events are not garbage collected.
+		</p>
+		<p>
+			The class instantiator has <code>destroyWidgetsInContext</code> and <code>destroyWidgetBySelector</code> functions.
+			Run any of these before your AJAX call and they will remove the instance from the widget dictionary and they try to fire the destroy function of the widget instance.
+			Unbind DOM events in the destroy function to clean them up once and for all.
+		</p>
+		<p>
+			When the AJAX call is done and the new content is added, scan it to get the classes to instantiate.
+			If the scanned nodes already had an instance (it could be that you re-scanned a bigger area of the page), the script will return the existing instance
+			and will not create a new one.
+			If the instance does not exist in the dictionary yet, the script will instantiate the class for that node.
 		</p>
 
+		<h2>Adding options to instances</h2>
+		<p>
+			If you add <code>data-options</code> attribute to a node which has a <code>data-widget</code> attribute,
+			the script will grab the contents of the <code>data-options</code> attribute and adds these
+			as an object to the class it instantiates. The options need to be in a JSON format.
+		</p>
 
+<pre><code data-language="html"><p>Some nice <span data-widget="tooltip" data-options='{"title":"I am a tooltip"}'>text</span> about something.</p></code></pre>
+		<p>Notice the single quotes around the object in the <code>data-options</code> attribute.</p>
 
+		<p>When you have multiple widgets on one DOM node the options work like this:</p>
+<pre><code data-language="html"><p>Some nice <span data-widget="tooltip;anotherwidget" data-tooltip-options='{"title":"I am a tooltip"}' data-anotherwidget-options='{"option":"option value"}'>text</span> about something.</p></code></pre>
+
+		<h1 id="public-functions">Class Instantiator public functions</h1>
+		<ul>
+			<li><code>scan</code>: Scan for elements that contain data-widget and instantiate the widget that is associated to the element.</li>
+			<li><code>getWidgetBySelector</code>: Get the widget instance for a DOM node.</li>
+			<li><code>getWidgetsInContext</code>: Get widgets in the context of a DOM node.</li>
+			<li><code>destroyWidgetBySelector</code>: Destroy the widget instance by calling the destroy function and by removing the data form the DOM node.</li>
+			<li><code>destroyWidgetsInContext</code>: Destroy widgets in context.</li>
+		</ul>
+
+		<h1 id="dependencies">Dependencies</h1>
+		<p>
+			The script works with jQuery or Zepto if they are included in the project.
+			Without Zepto or jQuery the Class Instantiator will only work in modern browsers.
+		</p>
+
+		<h1 id="the-widget">The widget itself</h1>
+		<p>A widget can be an object literal or a prototype, as long as they life in a namespace and have a public <code>destroy</code> function. Mine usually look like this:</p>
+
+<pre><code data-language="javascript">(function(ns)
+{
+    'use strict';
+
+    ns.EXAMPLE_CLASS = function(element, options)
+    {
+        var privareVar = 'privareVar',
+
+        init = function()
+        {
+            // Do init stuff here or bind an event.
+        },
+
+        privateFunction = function()
+        {
+            // I'm a private function
+        },
+
+        publicFunction = function()
+        {
+            // I'm a public function because I am returned at the bottom.
+        },
+
+        destroy = function()
+        {
+           // If events where bound, unbind them here.
+        };
+
+        init();
+
+        return {
+            destroy: destroy,
+            publicFunction: publicFunction
+        };
+    };
+}(window.NAMESPACE = window.NAMESPACE || {}));
+</code></pre>
 
 	</article>
 

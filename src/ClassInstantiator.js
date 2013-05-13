@@ -9,7 +9,7 @@
 
 	/**
 	 * ClassInstantiator Constructor.
-	 * @param  {String} dataAttr The data-attribute to scan for. Defaults to 'widget'.
+	 * @param {String} dataAttr The data-attribute to scan for. Defaults to 'widget'.
 	 * @constructor
 	 */
 	ns.ClassInstantiator = function (dataAttr)
@@ -108,7 +108,7 @@
 		/**
 		 * Convert from string to function.
 		 * @param {string} widgetName The name of the widget.
-		 * @return {funciton} Return the function the string translates to.
+		 * @return {function} Return the function the string translates to.
 		 */
 		cleanUpInstanceName = function (widgetName)
 		{

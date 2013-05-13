@@ -1,62 +1,69 @@
 ## JavaScript Class Instantiator
 This piece of code makes instantiating JavaScript classes a breeze.
 
-## Why
-We mostly create highly dynamic websites with loads of JavaScript and little page reloads.
-Content get's added by ajax and DOM events are all over the place.
+## Why you want this
+Because of the dynamic nature of our work, DOM and JavaScript function instances events can be all over the place.
+When the html often changes without a page reload it can be hard to keep track of their state.
+I created this script to avoid having to worry about the state of events and function instances when creating new HTML.
 
-Keeping track of events and JavaScript that is bound to DOM nodes can be a pain
-when the html is big and new content is constantly loaded with ajax.
+## How it works
+The point of this script is to keep your code as stateless as possible.
+The class instantiator has a scan function that scans a specific piece of html.
+If it finds DOM nodes with the `data-widget` attribute on it, it locates the JavaScript function which is named like the `data-widget` value and tries to instantiate it.
 
-I created this script to avoid having to worry about the state of events and class instances.
+If the function exists and it can be instantiated, the class instantiator saves the instance in a dictionary.
+`widgetDictionary[&lt;HTMLElement&gt;][&lt;widgetInstance&gt;];`
 
-## How
-The ClassInstantiator instantiates classes by scanning DOM nodes that have the `data-widget` tag.
-It binds the instance of the widget it found to the DOM node that has the `data-widget` attribute.
-Because the instance has been bound to the DOM node you just have to query the
-node to gain access to the public functions of the class.
+When the instance has public functions you can access these by asking the widget dictionary to return the instance you want by supplying the DOM node and the widget name.
 
+### Added benefit
 The `data-widget` tag gives extra semantics to the html and also enables less
 technical people to add JavaScript to a new piece of html in an easy way.
 Just add `data-widget="tooltip"` and you are done.
 
-The instantiator is not meant for classes that do not interact with the DOM.
-
-## How to use
+## Implementation
 ```html
-<div class="my-awesome-html">
-	<p>
-		Some nice <span data-widget="tooltip" title="I am a tooltip">text</span> about something.
-	</p>
+<div id="my-awesome-html">
+    <p>Nice <span data-widget="Tooltip" title="I am a Tooltip">text</span> about something.</p>
 </div>
 ```
 
 ```javascript
-$(function($, ns)
+(function(ns)
 {
-	ns.ClassInstantiatorInstance = new ns.ClassInstantiator();
-	ns.ClassInstantiatorInstance.scan($('.my-awesome-html'));
+    ns.ClassInstantiatorInstance = new ns.ClassInstantiator('widget');
+    ns.ClassInstantiatorInstance.scan(document.getElementById('my-awesome-html'));
 
-}(jQuery, window.NAMESPACE = window.NAMESPACE || {}));
+}(window.NAMESPACE = window.NAMESPACE || {}));
 ```
 
 Multiple widgets per DOM node are also possible. Just seperate them by a `;`.
+
 ```html
-<p>Some nice <span data-widget="tooltip;anotherwidget" title="I am a tooltip">text</span> about something.</p>
+<div id="my-awesome-html">
+    <p>Nice <span data-widget="Tooltip;AnotherWidget" title="I am a Tooltip">text</span> about something.</p>
+</div>
 ```
+The class instantiator is only meant to be used for functions that interact with DOM nodes. It is not meant for functions that are only called once.
 
 ### After an ajax call
-When new content has been loaded into an html element, new nodes with the `data-widget`
-attribute could have been added. Rescan the element after the ajax call to instantiate new classes.
+When new content has been loaded into an html element, new nodes with the `data-widget` attribute could have been added.
+If the html element used to contain widgets, there is a chance DOM events are still bound.
+Even when the html is gone, the events are not garbage collected.
 
-If the nodes already have an instance, the script will return that instance and
-will not create a new instance.
-If the instance does not exist the script will instantiate the class for that node.
+The class instantiator has `destroyWidgetsInContext` and `destroyWidgetBySelector` functions.
+Run any of these before your AJAX call and they will remove the instance from the widget dictionary and they try to fire the destroy function of the widget instance.
+Unbind DOM events in the destroy function to clean them up once and for all.
+
+When the AJAX call is done and the new content is added, scan it to get the classes to instantiate.
+If the scanned nodes already had an instance (it could be that you re-scanned a bigger area of the page), the script will return the existing instance
+and will not create a new one.
+If the instance does not exist in the dictionary yet, the script will instantiate the class for that node.
 
 ### Adding options to instances
 If you add `data-options` attribute to a node which has a `data-widget` attribute,
 the script will grab the contents of the `data-options` attribute and adds these
-as an object to the class it instantiates.
+as an object to the class it instantiates. The options need to be in a JSON format.
 
 ```html
 <p>Some nice <span data-widget="tooltip" data-options='{"title":"I am a tooltip"}'>text</span> about something.</p>
@@ -68,7 +75,7 @@ When you have multiple widgets on one DOM node the options work like this:
 <p>Some nice <span data-widget="tooltip;anotherwidget" data-tooltip-options='{"title":"I am a tooltip"}' data-anotherwidget-options='{"option":"option value"}'>text</span> about something.</p>
 ```
 
-### Public functions
+### Class Instantiator public functions
 The ClassInstantiator provides four public functions. Check the source code to see which variables they need.
 * `Scan` Scan for elements that contain data-widget and instantiate the widget that is associated to the element.
 * `getWidgetBySelector` Get the widget instance for a DOM node
@@ -76,47 +83,50 @@ The ClassInstantiator provides four public functions. Check the source code to s
 * `destroyWidget` Destroy the widget instance by calling the destroy function and by removing the data form the DOM node
 * `destroyWidgetsInContext` Destroy all the widgets inside a DOM node
 
-### How your classes have to look
+## Dependencies
+The script works with jQuery or Zepto if they are included in the project.
+Without Zepto or jQuery the Class Instantiator will only work in modern browsers.
+
+## The widget itself
 Your classes can be an object literal or a prototype, as long as they live in a namespace and have a public `destroy` function.
 
 ```javascript
 (function($, ns)
 {
-	"use strict";
+	'use strict';
 
-	ns.EXAMPLE_CLASS = function(element, options)
-	{
-		var el = $(element),
+    ns.EXAMPLE_CLASS = function(element, options)
+    {
+        var privareVar = 'privareVar',
 
-		init = function()
-		{
-			// Do init stuff here or bind an event.
-		},
+        init = function()
+        {
+            // Do init stuff here or bind an event.
+        },
 
-		privateFunction = function()
-		{
-			// I'm a private function
-		},
+        privateFunction = function()
+        {
+            // I'm a private function
+        },
 
-		publicFunction = function()
-		{
-			// I'm a public function because I am returned at the bottom.
-		},
+        publicFunction = function()
+        {
+            // I'm a public function because I am returned at the bottom.
+        },
 
-		destroy = function()
-		{
-			// If events where bound, unbind them here.
-		};
+        destroy = function()
+        {
+           // If events where bound, unbind them here.
+        };
 
-		init();
+        init();
 
-		return {
-			destroy: destroy,
-			publicFunction: publicFunction
-		};
-	};
-
-}(jQuery, window.NAMESPACE = window.NAMESPACE || {}));
+        return {
+            destroy: destroy,
+            publicFunction: publicFunction
+        };
+    };
+}(window.NAMESPACE = window.NAMESPACE || {}));
 ```
 
 ## Dependencies
