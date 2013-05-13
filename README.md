@@ -86,6 +86,7 @@ The ClassInstantiator provides four public functions. Check the source code to s
 ## Dependencies
 The script works with jQuery or Zepto if they are included in the project.
 Without Zepto or jQuery the Class Instantiator will only work in modern browsers.
+It does depend on JSON though.
 
 ## The widget itself
 Your classes can be an object literal or a prototype, as long as they live in a namespace and have a public `destroy` function.
@@ -128,6 +129,3 @@ Your classes can be an object literal or a prototype, as long as they live in a 
     };
 }(window.NAMESPACE = window.NAMESPACE || {}));
 ```
-
-## Dependencies
-jQuery
