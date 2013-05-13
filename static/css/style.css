@@ -57,6 +57,7 @@ pre {
   border: 1px solid #43484d;
   overflow: auto;
   display: block;
+  margin: 0 0 20px 0;
   line-height: 16px;
   word-wrap: break-word;
   -webkit-overflow-scrolling: touch;
