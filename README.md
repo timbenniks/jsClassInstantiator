@@ -37,6 +37,42 @@ Just add `data-widget="tooltip"` and you are done.
 }(window.NAMESPACE = window.NAMESPACE || {}));
 ```
 
+A sample tooltip widget
+```javascript
+(function($, ns)
+{
+    'use strict';
+
+    ns.Tooltip = function(element, options)
+    {
+        var el = $(element),
+			title = el.attr('title'),
+
+        init = function()
+        {
+             el.on('mouseenter.Tooltip mouseleave.Tooltip', handleToolTip);
+        },
+
+        handleToolTip = function(e)
+        {
+            // handle tooltip events
+        },
+
+        destroy = function()
+        {
+           el.off('mouseenter.Tooltip mouseleave.Tooltip');
+        };
+
+        init();
+
+        return {
+            destroy: destroy
+		};
+    };
+}(jQuery, window.NAMESPACE = window.NAMESPACE || {}));
+```
+
+
 Multiple widgets per DOM node are also possible. Just seperate them by a `;`.
 
 ```html
@@ -44,6 +80,7 @@ Multiple widgets per DOM node are also possible. Just seperate them by a `;`.
     <p>Nice <span data-widget="Tooltip;AnotherWidget" title="I am a Tooltip">text</span> about something.</p>
 </div>
 ```
+
 The class instantiator is only meant to be used for functions that interact with DOM nodes. It is not meant for functions that are only called once.
 
 ### After an ajax call
@@ -92,9 +129,9 @@ It does depend on JSON though.
 Your classes can be an object literal or a prototype, as long as they live in a namespace and have a public `destroy` function.
 
 ```javascript
-(function($, ns)
+(function(ns)
 {
-	'use strict';
+    'use strict';
 
     ns.EXAMPLE_CLASS = function(element, options)
     {
