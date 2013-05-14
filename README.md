@@ -37,7 +37,6 @@ Just add `data-widget="tooltip"` and you are done.
 }(window.NAMESPACE = window.NAMESPACE || {}));
 ```
 
-A sample tooltip widget
 ```javascript
 (function($, ns)
 {
@@ -71,7 +70,6 @@ A sample tooltip widget
     };
 }(jQuery, window.NAMESPACE = window.NAMESPACE || {}));
 ```
-
 
 Multiple widgets per DOM node are also possible. Just seperate them by a `;`.
 
