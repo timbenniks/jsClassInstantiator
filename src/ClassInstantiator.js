@@ -38,7 +38,7 @@
 		},
 
 		/**
-		 * Find elements that contain data-widget and add teh element and the widget to the widgets array.
+		 * Find elements that contain data-widget and add the element and the widget to the widgets array.
 		 * Multiple widgets can be added to a DOM node. Seperate them by a ';'.
 		 * @param {HTMLElement} context The context in which to search for DOM nodes.
 		 * @return {array} returns an array with the widget DOM node and the widget name.
@@ -48,7 +48,7 @@
 			context = context || document.body;
 
 			var widgetsFound = getNode(context, '[data-' + dataAttributeToScanFor + ']'),
-				i = 0, c = 0,
+				i = 0, c,
 				widgets = [];
 
 			for (; i < widgetsFound.length; i++)
@@ -56,7 +56,7 @@
 				var widget = widgetsFound[i],
 					widgetToInstantiate = getDataAttr(widget, dataAttributeToScanFor).split(';');
 
-				for (; c < widgetToInstantiate.length; c++)
+				for (c = 0; c < widgetToInstantiate.length; c++)
 				{
 					widgets.push({'widget': widget, 'widgetToInstantiate': widgetToInstantiate[c]});
 				}
@@ -67,42 +67,39 @@
 
 		/**
 		 * Instantiate a widget.
-		 * @param {HTMLELement} element The DOM node from which to instantiate the widget.
+		 * @param {HTMLELement} node The DOM node from which to instantiate the widget.
 		 * @param {string} widgetName The name of the widget to Instantiate.
 		 * @return {instance} The instantiated widget.
 		 */
-		instantiate = function (element, widgetName)
+		instantiate = function (node, widgetName)
 		{
 			var InstanceName = cleanUpInstanceName(widgetName),
-				options;
+				options, instance;
 
-			if (!widgetName || typeof InstanceName === 'string' || typeof InstanceName !== 'function')
+			if (!widgetName || typeof InstanceName !== 'function')
 			{
 				return false;
 			}
 
 			/**
 			 * When multiple widgets are applied to a single DOM node, use data-<widgetName>-options attributes
-			 * to give the widgets their own options obejcts.
+			 * to give the widgets their own option objects.
 			 */
-			options = getDataAttr(element, widgetName.toLowerCase() + 'Options') || getDataAttr(element, 'options') || {};
+			options = getDataAttr(node, widgetName.toLowerCase() + 'Options') || getDataAttr(node, 'options') || {};
 
 			if (typeof options === 'string')
 			{
 				options = JSON.parse(options);
 			}
 
-			if (!(element in widgetDictionary))
+			instance = new InstanceName(node, options);
+
+			if(!getWidgetFromDict(node, widgetName))
 			{
-				widgetDictionary[element] = [];
+				setWidgetInDict(node, widgetName, instance);
 			}
 
-			widgetDictionary[element][widgetName] = new InstanceName(element, options);
-
-			if (widgetName in widgetDictionary[element])
-			{
-				return widgetDictionary[element][widgetName];
-			}
+			return instance;
 		},
 
 		/**
@@ -131,23 +128,13 @@
 
 		/**
 		 * Get the widget instance for a DOM node.
-		 * @param {HTMLElement} selector DOM on which the widget lives.
+		 * @param {HTMLElement} node DOM on which the widget lives.
 		 * @param {string} widgetName Name of the widget you are looking for.
 		 * @return {instance} The instance of the widgetName.
 		 */
-		getWidgetBySelector = function (selector, widgetName)
+		getWidgetBySelector = function (node, widgetName)
 		{
-			if (selector in widgetDictionary)
-			{
-				if (widgetDictionary[selector][widgetName])
-				{
-					return widgetDictionary[selector][widgetName];
-				}
-			}
-			else
-			{
-				throw ('Cannot find [' + widgetName + '] on: ' + selector);
-			}
+			return getWidgetFromDict(node, widgetName);
 		},
 
 		/**
@@ -192,21 +179,16 @@
 		 * @param {HTMLElement} selector The DOM node of the widget.
 		 * @param {string} widgetName The widget you want to destroy.
 		 */
-		destroyWidgetBySelector = function (selector, widgetName)
+		destroyWidgetBySelector = function (node, widgetName)
 		{
-			var widgetInstance = getWidgetBySelector(selector, widgetName);
+			var widgetInstance = getWidgetBySelector(node, widgetName);
 
 			if (typeof widgetInstance.destroy === 'function')
 			{
 				widgetInstance.destroy();
 			}
-			else
-			{
-				throw ('Cannot find destroy function for: [' + widgetName + ']');
-			}
 
-			widgetDictionary[selector][widgetName] = null;
-			delete widgetDictionary[selector][widgetName];
+			removeWidgetFromDict(node, widgetName);
 		},
 
 		/**
@@ -248,7 +230,7 @@
 		 * Uses jQuery or Zepto if defined, otherwise resorts to dataset or getAttribute().
 		 * @param {HTMLElement} node The DOM node on which to find the data attribute.
 		 * @param {string} attr The name of the data attribute to find the value of.
-		 * @return {string / object} The value of teh data attribute.
+		 * @return {string / object} The value of the data attribute.
 		 */
 		getDataAttr = function (node, attr)
 		{
@@ -275,18 +257,56 @@
 		 * @param  {string} selector DOM node to find in context.
 		 * @return {object} Selected DOM node.
 		 */
-		getNode = function (context, selector)
+		getNode = function (context, node)
 		{
 			context = context || document.body;
 
 			if ($ && typeof $ === 'function')
 			{
-				return $(context).find(selector);
+				return $(context).find(node);
 			}
 			else
 			{
-				return context.querySelectorAll(selector);
+				return context.querySelectorAll(node);
 			}
+		},
+
+		/**
+		 * Returns an instance from the widgetDictionary
+		 * @param  {HTMLElement} node dictionary index.
+		 * @param  {String} widgetName The name of the widget of which you want to get the instance.
+		 * @return {object} Returns widget instance
+		 */
+		getWidgetFromDict = function(node, widgetName)
+		{
+			return widgetDictionary[node] && widgetDictionary[node][widgetName];
+		},
+
+		/**
+		 * Sets and instance in the widgetDictionary with the node as index.
+		 * @param  {HTMLElement} node dictionary index.
+		 * @param  {String} widgetName The name of the widget. duhh:)
+		 * @param  {object} instance the instance of the widget.
+		 */
+		setWidgetInDict = function(node, widgetName, instance)
+		{
+			if(!(node in widgetDictionary))
+			{
+				widgetDictionary[node] = [];
+			}
+
+			widgetDictionary[node][widgetName] = instance;
+		},
+
+		/**
+		 * Remove a widget instance from the widgetDictionary
+		 * @param  {HTMLElement} node dictionary index.
+		 * @param  {String} widgetName The name of the widget. duhh:)
+		 */
+		removeWidgetFromDict = function(node, widgetName)
+		{
+			widgetDictionary[node][widgetName] = null;
+			delete widgetDictionary[node][widgetName];
 		};
 
 		return {
@@ -299,7 +319,10 @@
 			destroyWidgetBySelector: destroyWidgetBySelector,
 			cleanUpInstanceName: cleanUpInstanceName,
 			getDataAttr: getDataAttr,
-			getNode: getNode
+			getNode: getNode,
+			getWidgetFromDict: getWidgetFromDict,
+			setWidgetInDict: setWidgetInDict,
+			removeWidgetFromDict: removeWidgetFromDict
 		};
 	};
 
