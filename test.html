@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>JavaScript Class Instantiator</title>
+	<link href="./static/css/style.css" rel="stylesheet" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=1,minimum-scale=1,maximum-scale=1" />
+</head>
+<body>
+
+<button data-widget="Tooltip" data-Tooltip-options='{"title":"tooltip1"}'>tooltip1</button>
+<button data-widget="Tooltip" data-Tooltip-options='{"title":"tooltip2"}'>tooltip2</button>
+
+<script src="./libs/jquery.js"></script>
+<script src="./src/ClassInstantiator.js"></script>
+
+<script>
+	(function ($, ns)
+	{
+		'use strict';
+
+		ns.Tooltip = function (element, options)
+		{
+			var el = $(element),
+				title = options.title,
+
+			init = function ()
+			{
+				el.on('click.tooltip', handleTooltip);
+			},
+
+			handleTooltip = function (e)
+			{
+				alert(title);
+			},
+
+			destroy = function()
+			{
+				element.off('click.tooltip');
+			};
+
+			init();
+
+			return {
+				widget: 'Tooltip',
+				destroy: destroy
+			};
+		};
+
+	}(jQuery, window.NAMESPACE = window.NAMESPACE || {}));
+
+	$(function($, ns)
+	{
+		ns.ClassInstantiatorInstance = new ns.ClassInstantiator('widget');
+		ns.ClassInstantiatorInstance.scan();
+
+		console.log(ns.ClassInstantiatorInstance.widgetDictionary);
+
+	}(jQuery, window.NAMESPACE = window.NAMESPACE || {}));
+
+</script>
+
+</body>
+</html>

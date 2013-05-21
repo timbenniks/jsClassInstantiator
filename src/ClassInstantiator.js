@@ -16,6 +16,7 @@
 	{
 		var dataAttributeToScanFor = dataAttr || 'widget',
 			widgetDictionary = [],
+			widgetDictionaryLength = 0,
 
 		/**
 		 * Scan for elements that contain data-widget and instantiate the widget that is associated to the element.
@@ -279,7 +280,13 @@
 		 */
 		getWidgetFromDict = function(node, widgetName)
 		{
-			return widgetDictionary[node] && widgetDictionary[node][widgetName];
+			for (var i = 0; i < widgetDictionaryLength; i++)
+			{
+				if (widgetDictionary[i].node === node && widgetDictionary[i].widgetName === widgetName)
+				{
+					return widgetDictionary[i].instance;
+				}
+			}
 		},
 
 		/**
@@ -290,12 +297,16 @@
 		 */
 		setWidgetInDict = function(node, widgetName, instance)
 		{
-			if(!(node in widgetDictionary))
+			for (var i = 0; i < widgetDictionaryLength; i++)
 			{
-				widgetDictionary[node] = [];
+				if (widgetDictionary[i].node === node && widgetDictionary[i].widgetName === widgetName)
+				{
+					widgetDictionary[i].instance = instance;
+					return;
+				}
 			}
 
-			widgetDictionary[node][widgetName] = instance;
+			widgetDictionary[widgetDictionaryLength++] = { node: node, widgetName: widgetName, instance: instance };
 		},
 
 		/**
@@ -305,8 +316,16 @@
 		 */
 		removeWidgetFromDict = function(node, widgetName)
 		{
-			widgetDictionary[node][widgetName] = null;
-			delete widgetDictionary[node][widgetName];
+			for (var i = 0; i < widgetDictionaryLength; i++)
+			{
+				if (widgetDictionary[i].node === node && widgetDictionary[i].widgetName === widgetName)
+				{
+					widgetDictionary[i] = null;
+					widgetDictionary.splice(i, 1);
+					widgetDictionaryLength--;
+					return;
+				}
+			}
 		};
 
 		return {
@@ -322,7 +341,8 @@
 			getNode: getNode,
 			getWidgetFromDict: getWidgetFromDict,
 			setWidgetInDict: setWidgetInDict,
-			removeWidgetFromDict: removeWidgetFromDict
+			removeWidgetFromDict: removeWidgetFromDict,
+			widgetDictionary: widgetDictionary
 		};
 	};
 

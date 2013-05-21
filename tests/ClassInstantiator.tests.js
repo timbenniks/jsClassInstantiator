@@ -86,6 +86,22 @@ test('cleanUpInstanceName', function()
 	ok(typeof otherWidgetInstanceName === 'function', 'NAMESPACE.Tooltip function was returned from string "OtherWidget"');
 });
 
+test('set/get/remove Widget from dictionary', function()
+{
+	var node = document.createElement('div'),
+		widgetName = 'mightyWidget',
+		instance = {widget: 'mightyWidget'};
+
+	NAMESPACE.Scanner.setWidgetInDict(node, widgetName, instance);
+
+	ok(NAMESPACE.Scanner.getWidgetFromDict(node, widgetName).widget === 'mightyWidget', 'The widget "mightyWidget" was returned by "getWidgetFromDict"');
+
+	NAMESPACE.Scanner.removeWidgetFromDict(node, widgetName);
+
+	ok(typeof NAMESPACE.Scanner.getWidgetFromDict(node, widgetName) === 'undefined', 'After "removeWidgetFromDict" the "getWidgetFromDict" for "mightyWidget" returns undefined');
+
+});
+
 module('ClassInstantiator core');
 
 test('findWidgets', function()
