@@ -58,7 +58,14 @@ ul, ol {
 
 p, ul, ol {
   margin: 0 0 20px 0;
+
+  &.prepre {
+      margin: 0 0 2px 0;
+      font-family: consolas, monaco, courier, monospace;
+      font-size: 11px;
+  }
 }
+
 
 article {
   padding: 0 2em;
@@ -72,7 +79,7 @@ pre {
   overflow: auto;
   display: block;
   margin: 0 0 20px 0;
-  line-height: 22px;
+  line-height: 18px;
   word-wrap: break-word;
 
   -webkit-overflow-scrolling: touch;
