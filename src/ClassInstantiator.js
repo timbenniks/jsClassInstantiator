@@ -146,18 +146,18 @@
 		 */
 		getWidgetsInContext = function (context, widgetName)
 		{
-			var widgets = [], widgetsFound, i = 0, c = 0;
+			var widgets = [], widgetsFound;
 
 			context = context || document.body;
 
 			widgetsFound = getNode(context, '[data-' + dataAttributeToScanFor + ']');
 
-			for (; i < widgetsFound.length; i++)
+			for (var i = 0; i < widgetsFound.length; i++)
 			{
 				var widget = widgetsFound[i],
 					widgetToReturn = getDataAttr(widget, dataAttributeToScanFor).split(';');
 
-				for (; c < widgetToReturn.length; c++)
+				for (var c = 0; c < widgetToReturn.length; c++)
 				{
 					if(widgetName && widgetName === widgetToReturn[c])
 					{
@@ -199,7 +199,7 @@
 		 */
 		destroyWidgetsInContext = function (context, widgetName)
 		{
-			var widgets = [], widgetsFound, i = 0, c = 0;
+			var widgets = [], widgetsFound;
 
 			context = context || document.body;
 
@@ -212,12 +212,12 @@
 				widgetsFound = getNode(context, '[data-' + dataAttributeToScanFor + ']');
 			}
 
-			for (; i < widgetsFound.length; i++)
+			for (var i = 0; i < widgetsFound.length; i++)
 			{
 				var widget = widgetsFound[i],
 					widgetToDestroy = getDataAttr(widget, dataAttributeToScanFor).split(';');
 
-				for (; c < widgetToDestroy.length; c++)
+				for (var c = 0; c < widgetToDestroy.length; c++)
 				{
 					destroyWidgetBySelector(widget, widgetToDestroy[c]);
 				}
